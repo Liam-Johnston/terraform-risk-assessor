@@ -19,6 +19,10 @@ inputs:
   model:
     description: "Model name to use (e.g. gpt-4o, claude-sonnet-4-20250514, gemini-2.0-flash)"
     required: true
+  additional-instructions:
+    description: "Extra repository-specific context appended to the system prompt, e.g. which change patterns are expected and routine in this repo"
+    required: false
+    default: ""
   comment-on-pr:
     description: "Whether to post the risk assessment as a PR comment (true/false)"
     required: false
