@@ -82,8 +82,35 @@ jobs:
 | `provider` | Yes | | AI provider: `openai`, `anthropic`, or `gemini` |
 | `api-key` | Yes | | API key for the chosen provider |
 | `model` | Yes | | Model name (e.g. `gpt-4o`, `claude-sonnet-4-20250514`, `gemini-2.0-flash`) |
+| `additional-instructions` | No | | Repository-specific context appended to the system prompt (see below) |
 | `comment-on-pr` | No | `true` | Post the assessment as a PR comment |
 | `github-token` | No | `GITHUB_TOKEN` | Token used for posting PR comments |
+
+### Additional instructions
+
+The default risk guidelines know nothing about your repository. `additional-instructions`
+lets you tell the assessor which change patterns are expected and routine, so that
+business-as-usual work is not rated as though it were a change to live infrastructure:
+
+```yaml
+- name: Assess Terraform Risk
+  uses: liamjohnston/terraform-risk-assessor@V1
+  with:
+    plan-json: plan.json
+    provider: gemini
+    api-key: ${{ secrets.GEMINI_API_KEY }}
+    model: gemini-3.1-pro-preview
+    additional-instructions: |
+      This repository is a GCP project factory. The routine change here is a new
+      sandbox project: a create-only plan adding a project, its budget, a shared-VPC
+      attachment and an owner binding scoped to that new project. Treat it as low.
+      Anything touching an existing project, or any delete or replace, is not routine.
+```
+
+The text is fenced inside the system prompt and explicitly subordinated to the risk
+guidelines: it can tell the model what is normal for your repository, but it cannot
+change the response schema or stop the model reporting a change that destroys,
+replaces or exposes existing infrastructure.
 
 ## Outputs
 

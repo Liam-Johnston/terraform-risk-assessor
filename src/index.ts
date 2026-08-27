@@ -11,6 +11,7 @@ const run = async () => {
     const providerName = core.getInput("provider", { required: true });
     const apiKey = core.getInput("api-key", { required: true });
     const model = core.getInput("model", { required: true });
+    const additionalInstructions = core.getInput("additional-instructions");
     const commentOnPr = core.getInput("comment-on-pr") === "true";
     const githubToken = core.getInput("github-token");
 
@@ -43,7 +44,10 @@ const run = async () => {
 
     // Create AI provider and assess
     const provider = createProvider(providerName, apiKey, model);
-    const assessment = await assessRisk(provider, summary);
+    if (additionalInstructions.trim() !== "") {
+      core.info("Applying repository-specific additional instructions.");
+    }
+    const assessment = await assessRisk(provider, summary, additionalInstructions);
 
     core.info(`Risk assessment complete: ${assessment.overallRisk.toUpperCase()}`);
 
